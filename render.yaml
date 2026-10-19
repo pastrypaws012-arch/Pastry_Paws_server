@@ -18,5 +18,7 @@ services:
         sync: false
       - key: CLOUDINARY_API_SECRET
         sync: false
+      - key: CLOUDINARY_FOLDER
+        value: PastryPaws
       - key: ADMIN_SECRET_KEY
         value: pastrypawsadmin2026

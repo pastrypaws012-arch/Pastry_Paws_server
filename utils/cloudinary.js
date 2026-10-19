@@ -44,7 +44,7 @@ export async function uploadToCloudinary({ buffer, originalname, mimetype }) {
       return await new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
-            folder: 'pastry_paws',
+            folder: process.env.CLOUDINARY_FOLDER || 'PastryPaws',
             transformation: [
               { quality: 'auto', fetch_format: 'auto' }, // Automatic WebP & modern compression
             ],
