@@ -3,12 +3,17 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import mongoose from 'mongoose';
 import { connectDB } from './config/db.js';
 import categoriesRouter from './routes/categories.js';
 import menuRouter from './routes/menu.js';
 import ordersRouter from './routes/orders.js';
 import uploadRouter from './routes/upload.js';
 import offeringsRouter from './routes/offerings.js';
+import { Category } from './models/Category.js';
+import { MenuItem } from './models/MenuItem.js';
+import { Order } from './models/Order.js';
+import { Offering } from './models/Offering.js';
 
 dotenv.config();
 
@@ -38,13 +43,56 @@ app.use('/api/upload', uploadRouter);
 app.use('/api/offerings', offeringsRouter);
 app.use('/api/specialties', offeringsRouter);
 
-// Health check endpoint
+// Health & System status endpoints
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'online',
     timestamp: new Date().toISOString(),
     service: 'Pastry Paws Backend API',
   });
+});
+
+app.get('/api/system/status', async (req, res) => {
+  try {
+    const mongoState = mongoose.connection.readyState; // 1 = connected
+    const [itemsCount, catsCount, ordersCount, offeringsCount] = await Promise.all([
+      MenuItem.countDocuments().catch(() => 0),
+      Category.countDocuments().catch(() => 0),
+      Order.countDocuments().catch(() => 0),
+      Offering.countDocuments().catch(() => 0),
+    ]);
+
+    const isCloudinaryConfigured = Boolean(
+      process.env.CLOUDINARY_CLOUD_NAME &&
+      process.env.CLOUDINARY_API_KEY &&
+      process.env.CLOUDINARY_API_SECRET
+    );
+
+    res.json({
+      success: true,
+      database: {
+        status: mongoState === 1 ? 'Connected' : 'Disconnected',
+        connected: mongoState === 1,
+        host: mongoose.connection.host || 'MongoDB Atlas',
+        name: mongoose.connection.name || 'pastrypaws',
+      },
+      cloudinary: {
+        configured: isCloudinaryConfigured,
+        cloudName: process.env.CLOUDINARY_CLOUD_NAME || 'Configured in Backend',
+        folder: process.env.CLOUDINARY_FOLDER || 'PastryPaws',
+      },
+      counts: {
+        menuItems: itemsCount,
+        categories: catsCount,
+        orders: ordersCount,
+        offerings: offeringsCount,
+      },
+      serverTime: new Date().toISOString(),
+      uptime: Math.round(process.uptime()),
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 });
 
 // Production: serve built React frontend

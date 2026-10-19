@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import { Order } from '../models/Order.js';
 
 const router = express.Router();
@@ -104,11 +105,20 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PATCH update order status
+// Helper to find order by _id or orderId safely
+const findOrderSafely = async (param) => {
+  if (mongoose.isValidObjectId(param)) {
+    const byId = await Order.findById(param);
+    if (byId) return byId;
+  }
+  return await Order.findOne({ orderId: param });
+};
+
+// PATCH update order status (Admin)
 router.patch('/:id/status', async (req, res) => {
   try {
     const { status } = req.body;
-    const order = await Order.findById(req.params.id);
+    const order = await findOrderSafely(req.params.id);
     if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
@@ -116,6 +126,37 @@ router.patch('/:id/status', async (req, res) => {
     order.status = status;
     await order.save();
     res.json({ success: true, data: order });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// PATCH /api/orders/:id/customer-cancel (Customer Self-Cancellation)
+// RULE: Customer can ONLY cancel if order status is 'pending'.
+// If confirmed, baking, or delivered, cancellation is disallowed.
+router.patch('/:id/customer-cancel', async (req, res) => {
+  try {
+    const order = await findOrderSafely(req.params.id);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found.' });
+    }
+
+    if (order.status !== 'pending') {
+      return res.status(400).json({
+        success: false,
+        message: `Order cannot be cancelled because it is already "${order.status}". Custom cakes and artisan bakes are prepared to order. Please contact our studio on WhatsApp for urgent changes.`,
+      });
+    }
+
+    order.status = 'cancelled';
+    order.cancellationReason = req.body.reason || 'Cancelled by customer';
+    await order.save();
+
+    res.json({
+      success: true,
+      message: 'Your order has been cancelled successfully.',
+      data: order,
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

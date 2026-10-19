@@ -1,7 +1,17 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import { Offering } from '../models/Offering.js';
 
 const router = express.Router();
+
+// Helper to safely match either custom string `id` or MongoDB `_id` without CastError
+const buildQuery = (idParam) => {
+  if (!idParam) return { id: '__invalid__' };
+  if (mongoose.isValidObjectId(idParam)) {
+    return { $or: [{ id: idParam }, { _id: idParam }] };
+  }
+  return { id: idParam };
+};
 
 // GET all offerings
 router.get('/', async (req, res) => {
@@ -16,7 +26,7 @@ router.get('/', async (req, res) => {
 // GET single offering
 router.get('/:id', async (req, res) => {
   try {
-    const offering = await Offering.findOne({ $or: [{ id: req.params.id }, { _id: req.params.id }] });
+    const offering = await Offering.findOne(buildQuery(req.params.id));
     if (!offering) {
       return res.status(404).json({ success: false, message: 'Offering not found' });
     }
@@ -26,9 +36,17 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST create offering
+// POST create offering (Strict Maximum of 4 Offerings)
 router.post('/', async (req, res) => {
   try {
+    const existingCount = await Offering.countDocuments({ isActive: true });
+    if (existingCount >= 4) {
+      return res.status(400).json({
+        success: false,
+        message: 'Maximum 4 offerings limit reached (UI restriction). Please edit or delete an existing offering to add a new one.',
+      });
+    }
+
     const {
       title,
       subtitle,
@@ -50,7 +68,7 @@ router.post('/', async (req, res) => {
 
     const newOffering = await Offering.create({
       id: customId,
-      number: number || '01',
+      number: number || `0${existingCount + 1}`,
       title: title.trim(),
       subtitle: subtitle ? subtitle.trim() : '',
       description: description ? description.trim() : '',
@@ -59,7 +77,7 @@ router.post('/', async (req, res) => {
       cloudinaryPublicId: cloudinaryPublicId || '',
       accent: accent ? accent.trim() : '',
       link: link || '#contact',
-      order: order !== undefined ? Number(order) : 1,
+      order: order !== undefined ? Number(order) : existingCount + 1,
       isActive: true,
     });
 
@@ -72,7 +90,7 @@ router.post('/', async (req, res) => {
 // PUT update offering
 router.put('/:id', async (req, res) => {
   try {
-    const offering = await Offering.findOne({ $or: [{ id: req.params.id }, { _id: req.params.id }] });
+    const offering = await Offering.findOne(buildQuery(req.params.id));
     if (!offering) {
       return res.status(404).json({ success: false, message: 'Offering not found' });
     }
@@ -107,7 +125,7 @@ router.put('/:id', async (req, res) => {
 // DELETE offering
 router.delete('/:id', async (req, res) => {
   try {
-    const offering = await Offering.findOneAndDelete({ $or: [{ id: req.params.id }, { _id: req.params.id }] });
+    const offering = await Offering.findOneAndDelete(buildQuery(req.params.id));
     if (!offering) {
       return res.status(404).json({ success: false, message: 'Offering not found' });
     }
