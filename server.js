@@ -26,7 +26,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve local fallback upload images if used
-app.use('/images/uploads', express.static(path.resolve(__dirname, '../frontend/public/images/uploads')));
+app.use('/images/uploads', express.static(path.resolve(__dirname, 'uploads')));
+app.use('/images/uploads', express.static(path.resolve(__dirname, '../Frontend/public/images/uploads')));
 
 // API Routes
 app.use('/api/categories', categoriesRouter);

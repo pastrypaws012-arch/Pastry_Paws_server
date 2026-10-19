@@ -85,9 +85,9 @@ export async function uploadToGoogleDrive({ buffer, originalname, mimetype }) {
     }
   }
 
-  // 2. Fallback to local public uploads folder if Google Drive is not configured
+  // 2. Fallback to local uploads folder if Google Drive is not configured
   try {
-    const uploadsDir = path.resolve(__dirname, '../../frontend/public/images/uploads');
+    const uploadsDir = path.resolve(__dirname, '../uploads');
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }

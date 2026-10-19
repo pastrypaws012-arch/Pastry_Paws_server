@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { connectDB } from '../config/db.js';
 import { Category } from '../models/Category.js';
 import { MenuItem } from '../models/MenuItem.js';
-import { categories, creationsData } from '../../frontend/src/data/creations.js';
+import { categories, creationsData } from '../data/seedData.js';
 
 dotenv.config();
 
