@@ -3,11 +3,49 @@ import { Order } from '../models/Order.js';
 
 const router = express.Router();
 
-// GET all orders
+// GET all orders (admin / general)
 router.get('/', async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 }).limit(100);
     res.json({ success: true, count: orders.length, data: orders });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// GET /api/orders/track?phone=...
+router.get('/track', async (req, res) => {
+  try {
+    const { phone } = req.query;
+    if (!phone || !phone.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Phone number is required to track orders.',
+      });
+    }
+
+    // Strip out non-digit characters (+91, spaces, dashes)
+    const digitsOnly = phone.replace(/[^0-9]/g, '');
+    if (digitsOnly.length < 5) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter a valid phone number (at least 5 digits).',
+      });
+    }
+
+    // Match by last 10 digits or exact substring
+    const lookupKey = digitsOnly.length >= 10 ? digitsOnly.slice(-10) : digitsOnly;
+
+    const orders = await Order.find({
+      customerPhone: { $regex: lookupKey, $options: 'i' },
+    }).sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      count: orders.length,
+      lookupKey,
+      data: orders,
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
