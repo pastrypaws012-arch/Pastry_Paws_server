@@ -131,10 +131,11 @@ router.patch('/:id/status', async (req, res) => {
   }
 });
 
-// PATCH /api/orders/:id/customer-cancel (Customer Self-Cancellation)
-// RULE: Customer can ONLY cancel if order status is 'pending'.
-// If confirmed, baking, or delivered, cancellation is disallowed.
-router.patch('/:id/customer-cancel', async (req, res) => {
+// PATCH /api/orders/:id/request-cancel (Customer Cancellation Request)
+// RULE 1: Customer can ONLY request cancellation if status is 'pending'.
+// RULE 2: Customer MUST provide a non-empty reason.
+// RULE 3: Order does NOT immediately cancel; it is placed in 'pending' cancellation review for admin approval.
+router.patch('/:id/request-cancel', async (req, res) => {
   try {
     const order = await findOrderSafely(req.params.id);
     if (!order) {
@@ -144,17 +145,114 @@ router.patch('/:id/customer-cancel', async (req, res) => {
     if (order.status !== 'pending') {
       return res.status(400).json({
         success: false,
-        message: `Order cannot be cancelled because it is already "${order.status}". Custom cakes and artisan bakes are prepared to order. Please contact our studio on WhatsApp for urgent changes.`,
+        message: `Order cannot be cancelled because it is already "${order.status}". Custom cakes and artisan bakes are prepared to order. Only pending orders can be cancelled. Please contact our studio on WhatsApp for urgent changes.`,
       });
     }
 
-    order.status = 'cancelled';
-    order.cancellationReason = req.body.reason || 'Cancelled by customer';
+    const { reason } = req.body;
+    if (!reason || !reason.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'A reason is required to submit a cancellation request.',
+      });
+    }
+
+    order.cancellationRequested = true;
+    order.cancellationStatus = 'pending';
+    order.cancellationReason = reason.trim();
+    order.cancellationRequestedAt = new Date();
     await order.save();
 
     res.json({
       success: true,
-      message: 'Your order has been cancelled successfully.',
+      message: 'Cancellation request submitted to bakery admin for review.',
+      data: order,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// PATCH /api/orders/:id/approve-cancel (Admin approves cancellation)
+// RULE: Admin accepts cancel request -> order status becomes 'cancelled', cancellationStatus becomes 'approved'.
+// No reason required from admin when approving.
+router.patch('/:id/approve-cancel', async (req, res) => {
+  try {
+    const order = await findOrderSafely(req.params.id);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found.' });
+    }
+
+    order.status = 'cancelled';
+    order.cancellationStatus = 'approved';
+    order.cancellationResolvedAt = new Date();
+    await order.save();
+
+    res.json({
+      success: true,
+      message: 'Order cancellation approved successfully.',
+      data: order,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// PATCH /api/orders/:id/deny-cancel (Admin denies cancellation)
+// RULE: Admin denies cancel request -> admin MUST provide a reason.
+// Order status stays active, cancellationStatus becomes 'denied'.
+router.patch('/:id/deny-cancel', async (req, res) => {
+  try {
+    const { reason } = req.body;
+    if (!reason || !reason.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'A reason is required from admin when denying a cancellation request.',
+      });
+    }
+
+    const order = await findOrderSafely(req.params.id);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found.' });
+    }
+
+    order.cancellationStatus = 'denied';
+    order.cancellationDeniedReason = reason.trim();
+    order.cancellationResolvedAt = new Date();
+    await order.save();
+
+    res.json({
+      success: true,
+      message: 'Cancellation request declined.',
+      data: order,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Backward compatibility alias for customer-cancel
+router.patch('/:id/customer-cancel', async (req, res) => {
+  try {
+    const order = await findOrderSafely(req.params.id);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found.' });
+    }
+    if (order.status !== 'pending') {
+      return res.status(400).json({
+        success: false,
+        message: `Order cannot be cancelled because it is already "${order.status}".`,
+      });
+    }
+    order.cancellationRequested = true;
+    order.cancellationStatus = 'pending';
+    order.cancellationReason = req.body.reason || 'Requested by customer';
+    order.cancellationRequestedAt = new Date();
+    await order.save();
+
+    res.json({
+      success: true,
+      message: 'Cancellation request submitted for review.',
       data: order,
     });
   } catch (error) {

@@ -64,6 +64,31 @@ const orderSchema = new mongoose.Schema(
       type: String,
       default: 'Pay on Delivery / UPI (Simulated)',
     },
+    cancellationRequested: {
+      type: Boolean,
+      default: false,
+    },
+    cancellationReason: {
+      type: String,
+      default: '',
+    },
+    cancellationStatus: {
+      type: String,
+      enum: ['none', 'pending', 'approved', 'denied'],
+      default: 'none',
+    },
+    cancellationDeniedReason: {
+      type: String,
+      default: '',
+    },
+    cancellationRequestedAt: {
+      type: Date,
+      default: null,
+    },
+    cancellationResolvedAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );
