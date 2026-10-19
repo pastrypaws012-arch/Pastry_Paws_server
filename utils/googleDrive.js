@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Initialize Google Drive client with Service Account
+// Initialize Image client with Service Account
 function getDriveClient() {
   const clientEmail = process.env.GOOGLE_DRIVE_CLIENT_EMAIL;
   let privateKey = process.env.GOOGLE_DRIVE_PRIVATE_KEY;
@@ -30,14 +30,14 @@ function getDriveClient() {
 }
 
 /**
- * Uploads a file buffer to Google Drive.
- * Falls back to local public uploads if Google Drive is not configured.
+ * Uploads a file buffer to Image.
+ * Falls back to local public uploads if Image is not configured.
  */
 export async function uploadToGoogleDrive({ buffer, originalname, mimetype }) {
   const drive = getDriveClient();
   const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
 
-  // 1. If Google Drive credentials configured, upload to Drive
+  // 1. If Image credentials configured, upload to Drive
   if (drive && folderId) {
     try {
       const bufferStream = new stream.PassThrough();
@@ -45,7 +45,7 @@ export async function uploadToGoogleDrive({ buffer, originalname, mimetype }) {
 
       const safeFileName = `pastry_paws_${Date.now()}_${originalname.replace(/\s+/g, '_')}`;
 
-      // Upload file to designated Google Drive folder
+      // Upload file to designated Image folder
       const response = await drive.files.create({
         requestBody: {
           name: safeFileName,
@@ -80,12 +80,12 @@ export async function uploadToGoogleDrive({ buffer, originalname, mimetype }) {
         storage: 'google_drive',
       };
     } catch (error) {
-      console.error('Google Drive Upload Error:', error.message);
+      console.error('Image Upload Error:', error.message);
       // Fallback to local storage if Drive fails
     }
   }
 
-  // 2. Fallback to local uploads folder if Google Drive is not configured
+  // 2. Fallback to local uploads folder if Image is not configured
   try {
     const uploadsDir = path.resolve(__dirname, '../uploads');
     if (!fs.existsSync(uploadsDir)) {
@@ -104,12 +104,12 @@ export async function uploadToGoogleDrive({ buffer, originalname, mimetype }) {
     };
   } catch (localError) {
     console.error('Local File Save Error:', localError.message);
-    throw new Error('Failed to upload image to Google Drive and local storage');
+    throw new Error('Failed to upload image to Image and local storage');
   }
 }
 
 /**
- * Deletes a file from Google Drive if needed
+ * Deletes a file from Image if needed
  */
 export async function deleteFromGoogleDrive(fileId) {
   if (!fileId) return false;
@@ -120,7 +120,7 @@ export async function deleteFromGoogleDrive(fileId) {
     await drive.files.delete({ fileId });
     return true;
   } catch (error) {
-    console.error('Google Drive Delete Error:', error.message);
+    console.error('Image Delete Error:', error.message);
     return false;
   }
 }

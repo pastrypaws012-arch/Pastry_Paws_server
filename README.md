@@ -1,6 +1,6 @@
 # 🍰 Pastry Paws - Backend API Server
 
-Express + Node.js backend with **MongoDB Atlas** database integration and **Google Drive API** image storage.
+Express + Node.js backend with **MongoDB Atlas** database integration and **Image API** image storage.
 
 ---
 
@@ -51,7 +51,7 @@ npm run seed
 - `POST /api/items` - Create new menu item with custom price tiers
 - `PUT /api/items/:id` - Update menu item
 - `DELETE /api/items/:id` - Delete menu item (auto-cleans Drive file)
-- `POST /api/upload` - Upload image directly to Google Drive
+- `POST /api/upload` - Upload image directly to Image
 - `GET /api/orders` - View recent orders for admin dashboard
 - `POST /api/orders` - Submit customer order
 - `PATCH /api/orders/:id/status` - Update order status (pending, baking, delivered)

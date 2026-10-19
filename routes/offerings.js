@@ -1,0 +1,120 @@
+import express from 'express';
+import { Offering } from '../models/Offering.js';
+
+const router = express.Router();
+
+// GET all offerings
+router.get('/', async (req, res) => {
+  try {
+    const offerings = await Offering.find({ isActive: true }).sort({ order: 1, createdAt: 1 });
+    res.json({ success: true, count: offerings.length, data: offerings });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// GET single offering
+router.get('/:id', async (req, res) => {
+  try {
+    const offering = await Offering.findOne({ $or: [{ id: req.params.id }, { _id: req.params.id }] });
+    if (!offering) {
+      return res.status(404).json({ success: false, message: 'Offering not found' });
+    }
+    res.json({ success: true, data: offering });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// POST create offering
+router.post('/', async (req, res) => {
+  try {
+    const {
+      title,
+      subtitle,
+      description,
+      price,
+      image,
+      cloudinaryPublicId,
+      accent,
+      number,
+      link,
+      order,
+    } = req.body;
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({ success: false, message: 'Title is required' });
+    }
+
+    const customId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now();
+
+    const newOffering = await Offering.create({
+      id: customId,
+      number: number || '01',
+      title: title.trim(),
+      subtitle: subtitle ? subtitle.trim() : '',
+      description: description ? description.trim() : '',
+      price: price ? price.trim() : '',
+      image: image || 'https://res.cloudinary.com/ku59ko3p/image/upload/v1792430625/PastryPaws/hero-cake.jpg',
+      cloudinaryPublicId: cloudinaryPublicId || '',
+      accent: accent ? accent.trim() : '',
+      link: link || '#contact',
+      order: order !== undefined ? Number(order) : 1,
+      isActive: true,
+    });
+
+    res.status(201).json({ success: true, data: newOffering });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// PUT update offering
+router.put('/:id', async (req, res) => {
+  try {
+    const offering = await Offering.findOne({ $or: [{ id: req.params.id }, { _id: req.params.id }] });
+    if (!offering) {
+      return res.status(404).json({ success: false, message: 'Offering not found' });
+    }
+
+    const fields = [
+      'number',
+      'title',
+      'subtitle',
+      'description',
+      'price',
+      'image',
+      'cloudinaryPublicId',
+      'accent',
+      'link',
+      'order',
+      'isActive',
+    ];
+
+    fields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        offering[field] = req.body[field];
+      }
+    });
+
+    await offering.save();
+    res.json({ success: true, data: offering });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// DELETE offering
+router.delete('/:id', async (req, res) => {
+  try {
+    const offering = await Offering.findOneAndDelete({ $or: [{ id: req.params.id }, { _id: req.params.id }] });
+    if (!offering) {
+      return res.status(404).json({ success: false, message: 'Offering not found' });
+    }
+    res.json({ success: true, message: 'Offering deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+export default router;

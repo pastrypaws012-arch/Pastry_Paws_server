@@ -8,6 +8,7 @@ import categoriesRouter from './routes/categories.js';
 import menuRouter from './routes/menu.js';
 import ordersRouter from './routes/orders.js';
 import uploadRouter from './routes/upload.js';
+import offeringsRouter from './routes/offerings.js';
 
 dotenv.config();
 
@@ -34,6 +35,8 @@ app.use('/api/categories', categoriesRouter);
 app.use('/api/items', menuRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/upload', uploadRouter);
+app.use('/api/offerings', offeringsRouter);
+app.use('/api/specialties', offeringsRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
