@@ -40,6 +40,7 @@ router.post('/', async (req, res) => {
       category,
       description,
       image,
+      cloudinaryPublicId,
       googleDriveFileId,
       alt,
       featured,
@@ -78,7 +79,8 @@ router.post('/', async (req, res) => {
       title: title.trim(),
       category: category.trim(),
       description: description ? description.trim() : '',
-      image: image || '/images/hero-cake.jpg',
+      image: image || 'https://res.cloudinary.com/ku59ko3p/image/upload/v1792430625/PastryPaws/hero-cake.jpg',
+      cloudinaryPublicId: cloudinaryPublicId || '',
       googleDriveFileId: googleDriveFileId || '',
       alt: alt || title.trim(),
       featured: Boolean(featured),
@@ -107,6 +109,7 @@ router.put('/:id', async (req, res) => {
       category,
       description,
       image,
+      cloudinaryPublicId,
       googleDriveFileId,
       alt,
       featured,
@@ -120,6 +123,7 @@ router.put('/:id', async (req, res) => {
     if (category) item.category = category.trim();
     if (description !== undefined) item.description = description.trim();
     if (image) item.image = image;
+    if (cloudinaryPublicId !== undefined) item.cloudinaryPublicId = cloudinaryPublicId;
     if (googleDriveFileId !== undefined) item.googleDriveFileId = googleDriveFileId;
     if (alt !== undefined) item.alt = alt;
     if (featured !== undefined) item.featured = Boolean(featured);

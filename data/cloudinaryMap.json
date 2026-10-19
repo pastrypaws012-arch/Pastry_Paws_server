@@ -1,0 +1,114 @@
+{
+  "/images/baker-story.jpg": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430617/PastryPaws/baker-story.jpg",
+    "public_id": "PastryPaws/baker-story"
+  },
+  "baker-story.jpg": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430617/PastryPaws/baker-story.jpg",
+    "public_id": "PastryPaws/baker-story"
+  },
+  "/images/biscoff-bowl.jpg": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430618/PastryPaws/biscoff-bowl.jpg",
+    "public_id": "PastryPaws/biscoff-bowl"
+  },
+  "biscoff-bowl.jpg": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430618/PastryPaws/biscoff-bowl.jpg",
+    "public_id": "PastryPaws/biscoff-bowl"
+  },
+  "/images/brownie-bowl.jpg": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430620/PastryPaws/brownie-bowl.jpg",
+    "public_id": "PastryPaws/brownie-bowl"
+  },
+  "brownie-bowl.jpg": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430620/PastryPaws/brownie-bowl.jpg",
+    "public_id": "PastryPaws/brownie-bowl"
+  },
+  "/images/brownies.jpg": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430622/PastryPaws/brownies.jpg",
+    "public_id": "PastryPaws/brownies"
+  },
+  "brownies.jpg": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430622/PastryPaws/brownies.jpg",
+    "public_id": "PastryPaws/brownies"
+  },
+  "/images/chocolate-bowl.jpg": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430623/PastryPaws/chocolate-bowl.jpg",
+    "public_id": "PastryPaws/chocolate-bowl"
+  },
+  "chocolate-bowl.jpg": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430623/PastryPaws/chocolate-bowl.jpg",
+    "public_id": "PastryPaws/chocolate-bowl"
+  },
+  "/images/hero-cake.jpg": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430625/PastryPaws/hero-cake.jpg",
+    "public_id": "PastryPaws/hero-cake"
+  },
+  "hero-cake.jpg": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430625/PastryPaws/hero-cake.jpg",
+    "public_id": "PastryPaws/hero-cake"
+  },
+  "/images/kitkat-oreo-bowl.jpg": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430627/PastryPaws/kitkat-oreo-bowl.jpg",
+    "public_id": "PastryPaws/kitkat-oreo-bowl"
+  },
+  "kitkat-oreo-bowl.jpg": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430627/PastryPaws/kitkat-oreo-bowl.jpg",
+    "public_id": "PastryPaws/kitkat-oreo-bowl"
+  },
+  "/images/nutella-bowl.jpg": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430628/PastryPaws/nutella-bowl.jpg",
+    "public_id": "PastryPaws/nutella-bowl"
+  },
+  "nutella-bowl.jpg": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430628/PastryPaws/nutella-bowl.jpg",
+    "public_id": "PastryPaws/nutella-bowl"
+  },
+  "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=800&q=80": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430629/PastryPaws/r7bv4x5tbakgskxjyxxz.jpg",
+    "public_id": "PastryPaws/r7bv4x5tbakgskxjyxxz"
+  },
+  "https://images.unsplash.com/photo-1586788680434-30d324b2d46f?auto=format&fit=crop&w=800&q=80": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430631/PastryPaws/cf3db6t4wraj6kpab0ft.jpg",
+    "public_id": "PastryPaws/cf3db6t4wraj6kpab0ft"
+  },
+  "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=800&q=80": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430633/PastryPaws/gra5sok9e6lungkmqs7r.jpg",
+    "public_id": "PastryPaws/gra5sok9e6lungkmqs7r"
+  },
+  "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=800&q=80": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430634/PastryPaws/clqa6e6gl1hylxv03lhz.jpg",
+    "public_id": "PastryPaws/clqa6e6gl1hylxv03lhz"
+  },
+  "https://images.unsplash.com/photo-1515037893149-de7f840978e2?auto=format&fit=crop&w=800&q=80": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430636/PastryPaws/kj5cvmhhs3ysqnykbba0.jpg",
+    "public_id": "PastryPaws/kj5cvmhhs3ysqnykbba0"
+  },
+  "https://images.unsplash.com/photo-1589218436045-ee320057f443?auto=format&fit=crop&w=800&q=80": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430637/PastryPaws/lapcap0mvrhofg6fko0r.jpg",
+    "public_id": "PastryPaws/lapcap0mvrhofg6fko0r"
+  },
+  "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430639/PastryPaws/wapjro2xooszwhcukjq3.jpg",
+    "public_id": "PastryPaws/wapjro2xooszwhcukjq3"
+  },
+  "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=800&q=80": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430640/PastryPaws/rnfooccjon09fg86z1va.jpg",
+    "public_id": "PastryPaws/rnfooccjon09fg86z1va"
+  },
+  "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=800&q=80": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430641/PastryPaws/kja7fqa6dzp029iatnpz.jpg",
+    "public_id": "PastryPaws/kja7fqa6dzp029iatnpz"
+  },
+  "https://images.unsplash.com/photo-1587668178277-295251f900ce?auto=format&fit=crop&w=800&q=80": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430642/PastryPaws/f7gt5kkpxtkpch21vewi.jpg",
+    "public_id": "PastryPaws/f7gt5kkpxtkpch21vewi"
+  },
+  "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?auto=format&fit=crop&w=800&q=80": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430643/PastryPaws/svco5trteap9t27npuav.jpg",
+    "public_id": "PastryPaws/svco5trteap9t27npuav"
+  },
+  "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80": {
+    "secure_url": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430644/PastryPaws/kisdzbs4aoyrfhemxzad.jpg",
+    "public_id": "PastryPaws/kisdzbs4aoyrfhemxzad"
+  }
+}

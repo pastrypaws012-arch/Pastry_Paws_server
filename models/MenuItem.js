@@ -51,7 +51,7 @@ const menuItemSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      default: '/images/hero-cake.jpg',
+      default: 'https://res.cloudinary.com/ku59ko3p/image/upload/v1792430625/PastryPaws/hero-cake.jpg',
       trim: true,
     },
     googleDriveFileId: {
