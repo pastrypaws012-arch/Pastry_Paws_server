@@ -1,6 +1,6 @@
 import express from 'express';
 import { MenuItem } from '../models/MenuItem.js';
-import { deleteFromGoogleDrive } from '../utils/googleDrive.js';
+import { deleteFromCloudinary } from '../utils/cloudinary.js';
 
 const router = express.Router();
 
@@ -157,9 +157,9 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ success: false, message: 'Item not found' });
     }
 
-    // If item had a Google Drive file, clean it up
-    if (item.googleDriveFileId) {
-      await deleteFromGoogleDrive(item.googleDriveFileId);
+    // Clean up image from Cloudinary if uploaded
+    if (item.cloudinaryPublicId) {
+      await deleteFromCloudinary(item.cloudinaryPublicId);
     }
 
     res.json({ success: true, message: 'Menu item deleted successfully' });

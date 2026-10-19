@@ -1,10 +1,10 @@
 import express from 'express';
 import multer from 'multer';
-import { uploadToGoogleDrive } from '../utils/googleDrive.js';
+import { uploadToCloudinary } from '../utils/cloudinary.js';
 
 const router = express.Router();
 
-// Memory storage for immediate streaming to Google Drive
+// Memory storage for immediate streaming to Cloudinary CDN
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -26,7 +26,7 @@ router.post('/', upload.single('image'), async (req, res) => {
       return res.status(400).json({ success: false, message: 'No image file uploaded' });
     }
 
-    const result = await uploadToGoogleDrive({
+    const result = await uploadToCloudinary({
       buffer: req.file.buffer,
       originalname: req.file.originalname,
       mimetype: req.file.mimetype,
@@ -35,11 +35,11 @@ router.post('/', upload.single('image'), async (req, res) => {
     res.json({
       success: true,
       imageUrl: result.imageUrl,
-      fileId: result.fileId,
+      publicId: result.publicId,
       storage: result.storage,
-      message: result.storage === 'google_drive' 
-        ? 'Uploaded directly to Google Drive successfully' 
-        : 'Saved to local uploads (Configure Google Drive credentials in .env to upload to Drive)',
+      message: result.storage === 'cloudinary' 
+        ? 'Uploaded and optimized on Cloudinary CDN!' 
+        : 'Saved locally (Add CLOUDINARY keys in .env to upload to Cloudinary)',
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

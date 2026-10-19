@@ -59,6 +59,11 @@ const menuItemSchema = new mongoose.Schema(
       default: '',
       trim: true,
     },
+    cloudinaryPublicId: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     alt: {
       type: String,
       default: '',

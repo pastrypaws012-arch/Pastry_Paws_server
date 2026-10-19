@@ -12,11 +12,11 @@ services:
         value: 5000
       - key: MONGODB_URI
         sync: false
-      - key: GOOGLE_DRIVE_CLIENT_EMAIL
+      - key: CLOUDINARY_CLOUD_NAME
         sync: false
-      - key: GOOGLE_DRIVE_PRIVATE_KEY
+      - key: CLOUDINARY_API_KEY
         sync: false
-      - key: GOOGLE_DRIVE_FOLDER_ID
+      - key: CLOUDINARY_API_SECRET
         sync: false
       - key: ADMIN_SECRET_KEY
         value: pastrypawsadmin2026
