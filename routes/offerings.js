@@ -37,14 +37,14 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST create offering (Strict Maximum of 4 Offerings)
+// POST create offering (Supports up to 8 Offerings)
 router.post('/', async (req, res) => {
   try {
     const existingCount = await Offering.countDocuments({ isActive: true });
-    if (existingCount >= 4) {
+    if (existingCount >= 8) {
       return res.status(400).json({
         success: false,
-        message: 'Maximum 4 offerings limit reached (UI restriction). Please edit or delete an existing offering to add a new one.',
+        message: 'Maximum 8 offerings limit reached. Please edit or delete an existing offering to add a new one.',
       });
     }
 
