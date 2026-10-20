@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
 import { connectDB } from './config/db.js';
@@ -44,6 +45,24 @@ app.use('/api/orders', ordersRouter);
 app.use('/api/upload', uploadRouter);
 app.use('/api/offerings', offeringsRouter);
 app.use('/api/specialties', offeringsRouter);
+
+// Root health check endpoint (vital for Render/Cloud platforms)
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    service: 'Pastry Paws Backend API',
+    version: '1.0.0',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      health: '/api/health',
+      menu: '/api/items',
+      categories: '/api/categories',
+      offerings: '/api/offerings',
+      orders: '/api/orders',
+      system: '/api/system/status',
+    },
+  });
+});
 
 // Health & System status endpoints
 app.get('/api/health', (req, res) => {
@@ -97,16 +116,17 @@ app.get('/api/system/status', async (req, res) => {
   }
 });
 
-// Production: serve built React frontend
+// Production: serve built React frontend if present
 if (process.env.NODE_ENV === 'production' || process.argv.includes('--production')) {
   const distPath = path.resolve(__dirname, '../frontend/dist');
-  app.use(express.static(distPath));
-
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'));
-  });
+  if (fs.existsSync(path.join(distPath, 'index.html'))) {
+    app.use(express.static(distPath));
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(distPath, 'index.html'));
+    });
+  }
 }
 
-app.listen(PORT, () => {
-  console.log(`🍰 Pastry Paws Server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🍰 Pastry Paws Server running on port ${PORT}`);
 });
