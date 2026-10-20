@@ -13,6 +13,7 @@ import uploadRouter from './routes/upload.js';
 import offeringsRouter from './routes/offerings.js';
 import authRouter from './routes/auth.js';
 import paymentConfigRouter from './routes/paymentConfig.js';
+import reviewsRouter from './routes/reviews.js';
 import { Category } from './models/Category.js';
 import { MenuItem } from './models/MenuItem.js';
 import { Order } from './models/Order.js';
@@ -47,6 +48,7 @@ app.use('/api/upload', uploadRouter);
 app.use('/api/offerings', offeringsRouter);
 app.use('/api/specialties', offeringsRouter);
 app.use('/api/payment-config', paymentConfigRouter);
+app.use('/api/google-reviews', reviewsRouter);
 
 // Root health check endpoint (vital for Render/Cloud platforms)
 app.get('/', (req, res) => {
