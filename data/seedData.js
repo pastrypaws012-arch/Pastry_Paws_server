@@ -441,7 +441,7 @@ export const creationsData = [
     "tags": [
       "1/2 kg: ₹499",
       "1 kg: ₹1199",
-      "Complimentary Mini Cookies"
+      "100% Handcrafted"
     ],
     "title": "Signature Chocolate Cake"
   },
@@ -451,7 +451,7 @@ export const creationsData = [
     "badge": "",
     "category": "Cakes",
     "cloudinaryPublicId": "PastryPaws/hero-cake",
-    "description": "Caramelized Lotus Biscoff biscuit spread infused sponge with silky Biscoff buttercream and crunchy biscuit crumbs. Includes complimentary mini cookies.",
+    "description": "Caramelized Lotus Biscoff biscuit spread infused sponge with silky Biscoff buttercream and crunchy biscuit crumbs.",
     "featured": true,
     "googleDriveFileId": "",
     "image": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430625/PastryPaws/hero-cake.jpg",
@@ -482,7 +482,7 @@ export const creationsData = [
     "badge": "",
     "category": "Cakes",
     "cloudinaryPublicId": "PastryPaws/cf3db6t4wraj6kpab0ft",
-    "description": "Vibrant ruby-red cocoa sponge layered with luscious cream cheese frosting. Complimentary mini cookies included for birthdays.",
+    "description": "Vibrant ruby-red cocoa sponge layered with luscious cream cheese frosting. Handcrafted fresh for celebrations.",
     "featured": false,
     "googleDriveFileId": "",
     "image": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430631/PastryPaws/cf3db6t4wraj6kpab0ft.jpg",
@@ -544,7 +544,7 @@ export const creationsData = [
     "badge": "",
     "category": "Cakes",
     "cloudinaryPublicId": "PastryPaws/gra5sok9e6lungkmqs7r",
-    "description": "Light, airy vanilla sponge made with pure butter and real vanilla cream. Includes complimentary mini cookies for birthdays.",
+    "description": "Light, airy vanilla sponge made with pure butter and real vanilla cream. Handcrafted fresh for celebrations.",
     "featured": false,
     "googleDriveFileId": "",
     "image": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430633/PastryPaws/gra5sok9e6lungkmqs7r.jpg",
@@ -980,10 +980,10 @@ export const specialtiesData = [
     "number": "01",
     "title": "Celebration Cakes",
     "subtitle": "Chocolate • Biscoff • Red Velvet • Vanilla",
-    "description": "Handcrafted cakes from 1/2 kg to 1 kg. Birthday cakes come with complimentary mini cookies!",
+    "description": "Handcrafted cakes from 1/2 kg to 1 kg. Freshly baked to order for all celebrations!",
     "price": "From ₹399/-",
     "image": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430629/PastryPaws/r7bv4x5tbakgskxjyxxz.jpg",
-    "accent": "Free Mini Cookies with Birthday Cakes"
+    "accent": "Freshly Baked"
   },
   {
     "id": "brownies-specialty",
