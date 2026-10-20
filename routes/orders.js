@@ -82,6 +82,7 @@ router.post('/', async (req, res) => {
       selectedSize,
       price,
       itemImage,
+      paymentMethod,
       paymentScreenshot,
       paymentScreenshotPublicId,
       transactionId,
@@ -94,70 +95,80 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Payment proof validation
-    if (!paymentScreenshot || !paymentScreenshot.trim()) {
-      return res.status(400).json({
-        success: false,
-        code: 'MISSING_SCREENSHOT',
-        message: 'Payment screenshot is required. Please upload the screenshot of your Google Pay / UPI payment.',
+    const isCOD = paymentMethod === 'Cash on Delivery' || paymentMethod === 'COD';
+    let cleanTxId = 'COD';
+    let finalPaymentStatus = 'cod_pending';
+    let finalPaymentMethod = 'Cash on Delivery';
+
+    if (!isCOD) {
+      finalPaymentMethod = 'Google Pay / UPI';
+      finalPaymentStatus = 'pending_verification';
+
+      // Payment proof validation for UPI / Online Payments
+      if (!paymentScreenshot || !paymentScreenshot.trim()) {
+        return res.status(400).json({
+          success: false,
+          code: 'MISSING_SCREENSHOT',
+          message: 'Payment screenshot is required. Please upload the screenshot of your Google Pay / UPI payment.',
+        });
+      }
+
+      if (!transactionId || !transactionId.trim()) {
+        return res.status(400).json({
+          success: false,
+          code: 'MISSING_TRANSACTION_ID',
+          message: 'UPI Transaction ID / UTR number is required. Please paste the reference number from your payment receipt.',
+        });
+      }
+
+      // Clean transaction ID (remove spaces, uppercase)
+      cleanTxId = transactionId.trim().replace(/\s+/g, '').toUpperCase();
+
+      // Validate transaction ID format (minimum 8 characters, maximum 35 characters)
+      if (cleanTxId.length < 8 || cleanTxId.length > 35) {
+        return res.status(400).json({
+          success: false,
+          code: 'INVALID_TRANSACTION_ID',
+          message: 'Please enter a valid UPI Transaction / UTR ID (typically 12 digits, e.g. 429182739102).',
+        });
+      }
+
+      // Check against obvious fake/dummy inputs
+      if (FAKE_TX_PATTERNS.some((pat) => pat.test(cleanTxId))) {
+        return res.status(400).json({
+          success: false,
+          code: 'SUSPICIOUS_TRANSACTION_ID',
+          message: 'The entered Transaction ID appears invalid. Please enter the genuine UTR reference number from your UPI app receipt.',
+        });
+      }
+
+      // ANTI-FRAUD GUARD 1: Prevent duplicate transaction IDs across all non-cancelled orders
+      const existingTx = await Order.findOne({
+        transactionId: cleanTxId,
+        status: { $ne: 'cancelled' },
       });
-    }
 
-    if (!transactionId || !transactionId.trim()) {
-      return res.status(400).json({
-        success: false,
-        code: 'MISSING_TRANSACTION_ID',
-        message: 'UPI Transaction ID / UTR number is required. Please paste the reference number from your payment receipt.',
+      if (existingTx) {
+        return res.status(400).json({
+          success: false,
+          code: 'DUPLICATE_TRANSACTION_ID',
+          message: `This UPI Transaction ID (${cleanTxId}) has already been used for Order #${existingTx.orderId}. Each order must have its own unique payment transaction.`,
+        });
+      }
+
+      // ANTI-FRAUD GUARD 2: Prevent duplicate payment screenshot reuse
+      const existingScreenshot = await Order.findOne({
+        paymentScreenshot: paymentScreenshot.trim(),
+        status: { $ne: 'cancelled' },
       });
-    }
 
-    // Clean transaction ID (remove spaces, uppercase)
-    const cleanTxId = transactionId.trim().replace(/\s+/g, '').toUpperCase();
-
-    // Validate transaction ID format (minimum 8 characters, maximum 35 characters)
-    if (cleanTxId.length < 8 || cleanTxId.length > 35) {
-      return res.status(400).json({
-        success: false,
-        code: 'INVALID_TRANSACTION_ID',
-        message: 'Please enter a valid UPI Transaction / UTR ID (typically 12 digits, e.g. 429182739102).',
-      });
-    }
-
-    // Check against obvious fake/dummy inputs
-    if (FAKE_TX_PATTERNS.some((pat) => pat.test(cleanTxId))) {
-      return res.status(400).json({
-        success: false,
-        code: 'SUSPICIOUS_TRANSACTION_ID',
-        message: 'The entered Transaction ID appears invalid. Please enter the genuine UTR reference number from your UPI app receipt.',
-      });
-    }
-
-    // ANTI-FRAUD GUARD 1: Prevent duplicate transaction IDs across all non-cancelled orders
-    const existingTx = await Order.findOne({
-      transactionId: cleanTxId,
-      status: { $ne: 'cancelled' },
-    });
-
-    if (existingTx) {
-      return res.status(400).json({
-        success: false,
-        code: 'DUPLICATE_TRANSACTION_ID',
-        message: `This UPI Transaction ID (${cleanTxId}) has already been used for Order #${existingTx.orderId}. Each order must have its own unique payment transaction.`,
-      });
-    }
-
-    // ANTI-FRAUD GUARD 2: Prevent duplicate payment screenshot reuse
-    const existingScreenshot = await Order.findOne({
-      paymentScreenshot: paymentScreenshot.trim(),
-      status: { $ne: 'cancelled' },
-    });
-
-    if (existingScreenshot) {
-      return res.status(400).json({
-        success: false,
-        code: 'DUPLICATE_SCREENSHOT',
-        message: `This payment receipt image was already submitted for Order #${existingScreenshot.orderId}. Please upload the actual payment screenshot for this order.`,
-      });
+      if (existingScreenshot) {
+        return res.status(400).json({
+          success: false,
+          code: 'DUPLICATE_SCREENSHOT',
+          message: `This payment receipt image was already submitted for Order #${existingScreenshot.orderId}. Please upload the actual payment screenshot for this order.`,
+        });
+      }
     }
 
     const orderId = `PP-${Date.now().toString().slice(-6)}`;
@@ -176,17 +187,19 @@ router.post('/', async (req, res) => {
       price: price || '',
       itemImage: itemImage || '',
       status: 'pending',
-      paymentMethod: 'Google Pay / UPI',
-      paymentStatus: 'pending_verification',
-      paymentScreenshot: paymentScreenshot.trim(),
-      paymentScreenshotPublicId: paymentScreenshotPublicId || '',
+      paymentMethod: finalPaymentMethod,
+      paymentStatus: finalPaymentStatus,
+      paymentScreenshot: isCOD ? '' : (paymentScreenshot ? paymentScreenshot.trim() : ''),
+      paymentScreenshotPublicId: isCOD ? '' : (paymentScreenshotPublicId || ''),
       transactionId: cleanTxId,
       paymentAmount: price || '',
     });
 
     res.status(201).json({
       success: true,
-      message: 'Order placed successfully! Payment verification is pending studio review.',
+      message: isCOD
+        ? 'Order placed successfully with Cash on Delivery! Our studio will prepare your treats.'
+        : 'Order placed successfully! Payment verification is pending studio review.',
       data: newOrder,
     });
   } catch (error) {
@@ -389,7 +402,9 @@ router.patch('/:id/verify-payment', async (req, res) => {
 
     res.json({
       success: true,
-      message: `Payment for Order #${order.orderId} verified and confirmed!`,
+      message: order.paymentMethod === 'Cash on Delivery'
+        ? `Cash payment for Order #${order.orderId} marked as collected and confirmed!`
+        : `Payment for Order #${order.orderId} verified and confirmed!`,
       data: order,
     });
   } catch (error) {

@@ -66,7 +66,7 @@ const orderSchema = new mongoose.Schema(
     },
     paymentStatus: {
       type: String,
-      enum: ['pending_verification', 'verified', 'rejected'],
+      enum: ['pending_verification', 'verified', 'rejected', 'cod_pending'],
       default: 'pending_verification',
     },
     paymentScreenshot: {
