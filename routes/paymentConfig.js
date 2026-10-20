@@ -4,8 +4,8 @@ import { PaymentConfig } from '../models/PaymentConfig.js';
 const router = express.Router();
 
 export const DEFAULT_PAYMENT_CONFIG = {
-  upiId: '9790983844@okaxis',
-  payeeName: 'Pastry Paws',
+  upiId: 'anjiasbeautylounge@okhdfcbank',
+  payeeName: 'Pastry Paws Bakery',
   phoneNumber: '9790983844',
   whatsappNumber: '919790983844',
   qrCodeImage: '',
