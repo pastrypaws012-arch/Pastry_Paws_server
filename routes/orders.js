@@ -205,6 +205,19 @@ const findOrderSafely = async (param) => {
   return await Order.findOne({ orderId: clean });
 };
 
+// GET /api/orders/:id - Dynamically fetch single order by orderId or _id from database
+router.get('/:id', async (req, res) => {
+  try {
+    const order = await findOrderSafely(req.params.id);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found in database.' });
+    }
+    res.json({ success: true, data: order });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // PATCH update order status (Admin)
 router.patch('/:id/status', async (req, res) => {
   try {
