@@ -7,10 +7,11 @@ const router = express.Router();
 // Helper to safely match either custom string `id` or MongoDB `_id` without CastError
 const buildQuery = (idParam) => {
   if (!idParam) return { id: '__invalid__' };
-  if (mongoose.isValidObjectId(idParam)) {
-    return { $or: [{ id: idParam }, { _id: idParam }] };
+  const clean = String(idParam).trim();
+  if (mongoose.isValidObjectId(clean)) {
+    return { $or: [{ id: clean }, { _id: clean }] };
   }
-  return { id: idParam };
+  return { id: clean };
 };
 
 // GET all offerings

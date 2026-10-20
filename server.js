@@ -10,6 +10,7 @@ import menuRouter from './routes/menu.js';
 import ordersRouter from './routes/orders.js';
 import uploadRouter from './routes/upload.js';
 import offeringsRouter from './routes/offerings.js';
+import authRouter from './routes/auth.js';
 import { Category } from './models/Category.js';
 import { MenuItem } from './models/MenuItem.js';
 import { Order } from './models/Order.js';
@@ -36,6 +37,7 @@ app.use('/images/uploads', express.static(path.resolve(__dirname, 'uploads')));
 app.use('/images/uploads', express.static(path.resolve(__dirname, '../Frontend/public/images/uploads')));
 
 // API Routes
+app.use('/api/auth', authRouter);
 app.use('/api/categories', categoriesRouter);
 app.use('/api/items', menuRouter);
 app.use('/api/orders', ordersRouter);

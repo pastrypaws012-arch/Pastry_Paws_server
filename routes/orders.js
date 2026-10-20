@@ -107,11 +107,13 @@ router.post('/', async (req, res) => {
 
 // Helper to find order by _id or orderId safely
 const findOrderSafely = async (param) => {
-  if (mongoose.isValidObjectId(param)) {
-    const byId = await Order.findById(param);
+  if (!param) return null;
+  const clean = String(param).trim();
+  if (mongoose.isValidObjectId(clean)) {
+    const byId = await Order.findById(clean);
     if (byId) return byId;
   }
-  return await Order.findOne({ orderId: param });
+  return await Order.findOne({ orderId: clean });
 };
 
 // PATCH update order status (Admin)
@@ -124,6 +126,12 @@ router.patch('/:id/status', async (req, res) => {
     }
 
     order.status = status;
+    if (status === 'cancelled') {
+      if (order.cancellationStatus === 'pending') {
+        order.cancellationStatus = 'approved';
+      }
+      order.cancellationResolvedAt = new Date();
+    }
     await order.save();
     res.json({ success: true, data: order });
   } catch (error) {
