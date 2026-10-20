@@ -420,7 +420,7 @@ export const creationsData = [
     "badge": "Bestseller",
     "category": "Cakes",
     "cloudinaryPublicId": "PastryPaws/r7bv4x5tbakgskxjyxxz",
-    "description": "Decadent layered chocolate sponge cloaked in velvety chocolate ganache and chocolate curls. Birthday cakes include complimentary mini cookies!",
+    "description": "Decadent layered chocolate sponge cloaked in velvety chocolate ganache and chocolate curls.  ",
     "featured": true,
     "googleDriveFileId": "",
     "image": "https://res.cloudinary.com/ku59ko3p/image/upload/v1792430629/PastryPaws/r7bv4x5tbakgskxjyxxz.jpg",
