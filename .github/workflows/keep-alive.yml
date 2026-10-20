@@ -1,0 +1,47 @@
+name: Keep Render Backend Active
+
+# Trigger every 12 minutes (Render free tier spins down after 15 minutes of inactivity)
+on:
+  schedule:
+    - cron: '*/12 * * * *'
+  # Allow manual trigger directly from the GitHub Actions dashboard
+  workflow_dispatch:
+
+concurrency:
+  group: keep-alive-render
+  cancel-in-progress: true
+
+jobs:
+  ping-server:
+    name: Ping Pastry Paws API
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+
+    steps:
+      - name: Send Heartbeat Request
+        run: |
+          TARGET_URL="${{ vars.BACKEND_HEALTH_URL || 'https://pastry-paws-server.onrender.com/api/health' }}"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎯 Target URL : $TARGET_URL"
+          echo "⏰ UTC Time   : $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          # Ping the health check endpoint with a 30s timeout
+          RESPONSE=$(curl -sS --max-time 30 -w "\nHTTP_STATUS:%{http_code}\nTIME_TOTAL:%{time_total}s" "$TARGET_URL")
+          
+          BODY=$(echo "$RESPONSE" | sed -e '/HTTP_STATUS:/d' -e '/TIME_TOTAL:/d')
+          HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS:" | cut -d: -f2)
+          TIME_TOTAL=$(echo "$RESPONSE" | grep "TIME_TOTAL:" | cut -d: -f2)
+          
+          echo "📡 Response Body: $BODY"
+          echo "⏱️ Total Time   : $TIME_TOTAL"
+          echo "📊 HTTP Status  : $HTTP_STATUS"
+          
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+            echo "✅ Server heartbeat successful! Backend is awake and responsive."
+            exit 0
+          else
+            echo "⚠️ Warning: Expected 2xx/3xx response, got HTTP $HTTP_STATUS"
+            # Do not fail hard to prevent unnecessary noisy GitHub notification emails
+            exit 0
+          fi
