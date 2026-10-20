@@ -62,7 +62,37 @@ const orderSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      default: 'Pay on Delivery / UPI (Simulated)',
+      default: 'Google Pay / UPI',
+    },
+    paymentStatus: {
+      type: String,
+      enum: ['pending_verification', 'verified', 'rejected'],
+      default: 'pending_verification',
+    },
+    paymentScreenshot: {
+      type: String,
+      default: '',
+    },
+    paymentScreenshotPublicId: {
+      type: String,
+      default: '',
+    },
+    transactionId: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    paymentAmount: {
+      type: String,
+      default: '',
+    },
+    paymentVerifiedAt: {
+      type: Date,
+      default: null,
+    },
+    paymentRejectedReason: {
+      type: String,
+      default: '',
     },
     cancellationRequested: {
       type: Boolean,
