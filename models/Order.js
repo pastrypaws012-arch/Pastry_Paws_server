@@ -47,6 +47,28 @@ const orderSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    quantity: {
+      type: Number,
+      default: 1,
+      min: 1,
+    },
+    selectedAddons: {
+      type: [
+        {
+          name: { type: String, required: true },
+          price: { type: Number, required: true },
+        },
+      ],
+      default: [],
+    },
+    addonsTotal: {
+      type: Number,
+      default: 0,
+    },
+    totalAmount: {
+      type: Number,
+      default: 0,
+    },
     price: {
       type: String,
       required: true,

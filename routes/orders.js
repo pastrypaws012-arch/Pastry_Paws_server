@@ -80,6 +80,10 @@ router.post('/', async (req, res) => {
       itemTitle,
       category,
       selectedSize,
+      quantity,
+      selectedAddons,
+      addonsTotal,
+      totalAmount,
       price,
       itemImage,
       paymentMethod,
@@ -173,6 +177,19 @@ router.post('/', async (req, res) => {
 
     const orderId = `PP-${Date.now().toString().slice(-6)}`;
 
+    const parsedQty = Math.max(1, parseInt(quantity, 10) || 1);
+    const cleanedSelectedAddons = Array.isArray(selectedAddons)
+      ? selectedAddons
+          .map((a) => ({
+            name: typeof a.name === 'string' ? a.name.trim() : '',
+            price: Math.max(0, parseInt(String(a.price).replace(/[^0-9]/g, ''), 10) || 0),
+          }))
+          .filter((a) => a.name.length > 0)
+      : [];
+
+    const computedAddonsTotal = cleanedSelectedAddons.reduce((sum, a) => sum + a.price, 0) * parsedQty;
+    const finalTotalAmount = Number(totalAmount) || (parseFloat(String(price).replace(/[^0-9.]/g, '')) || 0);
+
     const newOrder = await Order.create({
       orderId,
       customerName: customerName.trim(),
@@ -184,7 +201,11 @@ router.post('/', async (req, res) => {
       itemTitle: itemTitle.trim(),
       category: category || '',
       selectedSize: selectedSize || '',
-      price: price || '',
+      quantity: parsedQty,
+      selectedAddons: cleanedSelectedAddons,
+      addonsTotal: computedAddonsTotal,
+      totalAmount: finalTotalAmount,
+      price: price || (finalTotalAmount ? `₹${finalTotalAmount}/-` : ''),
       itemImage: itemImage || '',
       status: 'pending',
       paymentMethod: finalPaymentMethod,
@@ -192,7 +213,7 @@ router.post('/', async (req, res) => {
       paymentScreenshot: isCOD ? '' : (paymentScreenshot ? paymentScreenshot.trim() : ''),
       paymentScreenshotPublicId: isCOD ? '' : (paymentScreenshotPublicId || ''),
       transactionId: cleanTxId,
-      paymentAmount: price || '',
+      paymentAmount: price || (finalTotalAmount ? `₹${finalTotalAmount}/-` : ''),
     });
 
     res.status(201).json({

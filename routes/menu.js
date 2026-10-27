@@ -46,6 +46,7 @@ router.post('/', async (req, res) => {
       featured,
       badge,
       pricingDetails,
+      addons,
     } = req.body;
 
     if (!title || !category) {
@@ -72,6 +73,16 @@ router.post('/', async (req, res) => {
         .join(' • ');
     }
 
+    // Clean and validate addons array
+    const cleanedAddons = Array.isArray(addons)
+      ? addons
+          .map((a) => ({
+            name: typeof a.name === 'string' ? a.name.trim() : '',
+            price: Math.max(0, parseInt(String(a.price).replace(/[^0-9]/g, ''), 10) || 0),
+          }))
+          .filter((a) => a.name.length > 0)
+      : [];
+
     const customId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now();
 
     const newItem = await MenuItem.create({
@@ -86,6 +97,7 @@ router.post('/', async (req, res) => {
       featured: Boolean(featured),
       badge: badge ? badge.trim() : '',
       pricingDetails: pricingDetails || [],
+      addons: cleanedAddons,
       startingPrice,
       priceDisplay,
     });
@@ -115,6 +127,7 @@ router.put('/:id', async (req, res) => {
       featured,
       badge,
       pricingDetails,
+      addons,
       isAvailable,
       order,
     } = req.body;
@@ -130,6 +143,17 @@ router.put('/:id', async (req, res) => {
     if (badge !== undefined) item.badge = badge.trim();
     if (isAvailable !== undefined) item.isAvailable = Boolean(isAvailable);
     if (order !== undefined) item.order = Number(order);
+
+    if (addons !== undefined) {
+      item.addons = Array.isArray(addons)
+        ? addons
+            .map((a) => ({
+              name: typeof a.name === 'string' ? a.name.trim() : '',
+              price: Math.max(0, parseInt(String(a.price).replace(/[^0-9]/g, ''), 10) || 0),
+            }))
+            .filter((a) => a.name.length > 0)
+        : [];
+    }
 
     if (pricingDetails && pricingDetails.length > 0) {
       item.pricingDetails = pricingDetails;

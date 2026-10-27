@@ -16,6 +16,22 @@ const pricingTierSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const addonSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+  },
+  { _id: false }
+);
+
 const menuItemSchema = new mongoose.Schema(
   {
     id: {
@@ -84,6 +100,10 @@ const menuItemSchema = new mongoose.Schema(
     },
     pricingDetails: {
       type: [pricingTierSchema],
+      default: [],
+    },
+    addons: {
+      type: [addonSchema],
       default: [],
     },
     isAvailable: {
