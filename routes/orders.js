@@ -77,6 +77,7 @@ router.post('/', async (req, res) => {
       deliveryDate,
       deliveryTime,
       notes,
+      items, // Multi-item cart array
       itemTitle,
       category,
       selectedSize,
@@ -92,10 +93,13 @@ router.post('/', async (req, res) => {
       transactionId,
     } = req.body;
 
-    if (!customerName || !customerPhone || !deliveryAddress || !itemTitle) {
+    const hasItemsArray = Array.isArray(items) && items.length > 0;
+    const effectiveTitle = hasItemsArray ? items.map((i) => i.itemTitle).join(', ') : itemTitle;
+
+    if (!customerName || !customerPhone || !deliveryAddress || (!effectiveTitle && !hasItemsArray)) {
       return res.status(400).json({
         success: false,
-        message: 'Customer name, phone, delivery address, and item title are required.',
+        message: 'Customer name, phone, delivery address, and items are required.',
       });
     }
 
@@ -177,7 +181,43 @@ router.post('/', async (req, res) => {
 
     const orderId = `PP-${Date.now().toString().slice(-6)}`;
 
-    const parsedQty = Math.max(1, parseInt(quantity, 10) || 1);
+    let cleanedItems = [];
+    let computedTotalAmount = 0;
+    let computedTotalQty = 0;
+
+    if (hasItemsArray) {
+      cleanedItems = items.map((it) => {
+        const qty = Math.max(1, parseInt(it.quantity, 10) || 1);
+        const unitP = Math.max(0, parseFloat(String(it.unitPrice || it.price || 0).replace(/[^0-9.]/g, '')) || 0);
+        const addons = Array.isArray(it.selectedAddons)
+          ? it.selectedAddons
+              .map((a) => ({
+                name: typeof a.name === 'string' ? a.name.trim() : '',
+                price: Math.max(0, parseInt(String(a.price).replace(/[^0-9]/g, ''), 10) || 0),
+              }))
+              .filter((a) => a.name.length > 0)
+          : [];
+        const addonsUnitP = addons.reduce((sum, a) => sum + a.price, 0);
+        const lineItemTotal = (unitP + addonsUnitP) * qty;
+
+        computedTotalAmount += lineItemTotal;
+        computedTotalQty += qty;
+
+        return {
+          itemTitle: it.itemTitle ? String(it.itemTitle).trim() : 'Artisan Treat',
+          category: it.category ? String(it.category).trim() : '',
+          selectedSize: it.selectedSize ? String(it.selectedSize).trim() : 'Standard',
+          quantity: qty,
+          unitPrice: unitP,
+          selectedAddons: addons,
+          addonsTotal: addonsUnitP * qty,
+          itemTotal: lineItemTotal,
+          itemImage: it.itemImage || '',
+        };
+      });
+    }
+
+    const parsedQty = hasItemsArray ? computedTotalQty : Math.max(1, parseInt(quantity, 10) || 1);
     const cleanedSelectedAddons = Array.isArray(selectedAddons)
       ? selectedAddons
           .map((a) => ({
@@ -187,8 +227,35 @@ router.post('/', async (req, res) => {
           .filter((a) => a.name.length > 0)
       : [];
 
-    const computedAddonsTotal = cleanedSelectedAddons.reduce((sum, a) => sum + a.price, 0) * parsedQty;
-    const finalTotalAmount = Number(totalAmount) || (parseFloat(String(price).replace(/[^0-9.]/g, '')) || 0);
+    const computedAddonsTotal = hasItemsArray
+      ? cleanedItems.reduce((sum, it) => sum + (it.addonsTotal || 0), 0)
+      : cleanedSelectedAddons.reduce((sum, a) => sum + a.price, 0) * parsedQty;
+
+    const finalTotalAmount =
+      Number(totalAmount) ||
+      (hasItemsArray ? computedTotalAmount : parseFloat(String(price).replace(/[^0-9.]/g, '')) || 0);
+
+    const finalTitle = hasItemsArray
+      ? cleanedItems.length === 1
+        ? cleanedItems[0].itemTitle
+        : `${cleanedItems[0].itemTitle} (+${cleanedItems.length - 1} more items)`
+      : (itemTitle || '').trim();
+
+    const finalSize = hasItemsArray
+      ? cleanedItems.length === 1
+        ? cleanedItems[0].selectedSize
+        : 'Multiple Sizes'
+      : (selectedSize || '');
+
+    const finalCategory = hasItemsArray
+      ? cleanedItems.length === 1
+        ? cleanedItems[0].category
+        : 'Assorted Treats'
+      : (category || '');
+
+    const finalImage = hasItemsArray
+      ? cleanedItems[0]?.itemImage || itemImage || ''
+      : (itemImage || '');
 
     const newOrder = await Order.create({
       orderId,
@@ -198,15 +265,16 @@ router.post('/', async (req, res) => {
       deliveryDate: deliveryDate || '',
       deliveryTime: deliveryTime || '',
       notes: notes ? notes.trim() : '',
-      itemTitle: itemTitle.trim(),
-      category: category || '',
-      selectedSize: selectedSize || '',
+      items: cleanedItems,
+      itemTitle: finalTitle,
+      category: finalCategory,
+      selectedSize: finalSize,
       quantity: parsedQty,
-      selectedAddons: cleanedSelectedAddons,
+      selectedAddons: hasItemsArray ? (cleanedItems[0]?.selectedAddons || []) : cleanedSelectedAddons,
       addonsTotal: computedAddonsTotal,
       totalAmount: finalTotalAmount,
       price: price || (finalTotalAmount ? `₹${finalTotalAmount}/-` : ''),
-      itemImage: itemImage || '',
+      itemImage: finalImage,
       status: 'pending',
       paymentMethod: finalPaymentMethod,
       paymentStatus: finalPaymentStatus,

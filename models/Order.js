@@ -1,5 +1,57 @@
 import mongoose from 'mongoose';
 
+const orderItemSchema = new mongoose.Schema(
+  {
+    itemTitle: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    category: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    selectedSize: {
+      type: String,
+      default: 'Standard',
+      trim: true,
+    },
+    quantity: {
+      type: Number,
+      default: 1,
+      min: 1,
+    },
+    unitPrice: {
+      type: Number,
+      default: 0,
+    },
+    selectedAddons: {
+      type: [
+        {
+          name: { type: String, required: true },
+          price: { type: Number, required: true },
+        },
+      ],
+      default: [],
+    },
+    addonsTotal: {
+      type: Number,
+      default: 0,
+    },
+    itemTotal: {
+      type: Number,
+      default: 0,
+    },
+    itemImage: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+  },
+  { _id: false }
+);
+
 const orderSchema = new mongoose.Schema(
   {
     orderId: {
@@ -35,6 +87,12 @@ const orderSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    // Multi-item cart support
+    items: {
+      type: [orderItemSchema],
+      default: [],
+    },
+    // Top-level summary fields for backwards compatibility
     itemTitle: {
       type: String,
       required: true,
