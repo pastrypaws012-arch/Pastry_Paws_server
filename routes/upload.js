@@ -35,7 +35,9 @@ router.post('/', upload.single('image'), async (req, res) => {
     res.json({
       success: true,
       imageUrl: result.imageUrl,
+      url: result.imageUrl,
       publicId: result.publicId,
+      public_id: result.publicId,
       storage: result.storage,
       message: result.storage === 'cloudinary' 
         ? 'Uploaded and optimized on Cloudinary CDN!' 
